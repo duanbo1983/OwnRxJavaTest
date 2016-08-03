@@ -38,6 +38,7 @@ public class MultipleTaskRx {
         static Random random = new Random();
 
         ExecutorService executorService = Executors.newFixedThreadPool(3);
+        Scheduler mScheduler = Schedulers.from(executorService);
 
         public Observable<Boolean> download(List<String> imageUrlList) {
             if (imageUrlList == null || imageUrlList.size() == 0) {
@@ -70,7 +71,7 @@ public class MultipleTaskRx {
                 }
 
                 return Observable.just(true);
-            }).subscribeOn(Schedulers.from(executorService));
+            }).subscribeOn(mScheduler);
         }
     }
 }
