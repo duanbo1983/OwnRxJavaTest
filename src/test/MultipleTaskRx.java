@@ -1,17 +1,14 @@
 package test;
 
+import rx.Observable;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import rx.Observable;
-import rx.Scheduler;
-import rx.functions.Action1;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.functions.FuncN;
-import rx.schedulers.Schedulers;
 
 public class MultipleTaskRx {
 
@@ -40,7 +37,8 @@ public class MultipleTaskRx {
 
         static Random random = new Random();
 
-        Scheduler mScheduler = Schedulers.from(Executors.newFixedThreadPool(3));
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        Scheduler mScheduler = Schedulers.from(executorService);
 
         public Observable<Boolean> download(List<String> imageUrlList) {
             if (imageUrlList == null || imageUrlList.size() == 0) {
@@ -55,6 +53,7 @@ public class MultipleTaskRx {
                                 return false;
                             }
                         }
+                        executorService.shutdownNow();
                         return true;
                     });
         }
