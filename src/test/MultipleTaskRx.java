@@ -23,18 +23,17 @@ public class MultipleTaskRx {
         new ImageDownloader()
                 .download(list)
                 .subscribe(
-                        new Action1<Boolean>() {
-                            @Override
-                            public void call(Boolean aBoolean) {
-                                System.out.println("Download finish? " + aBoolean);
-                            }
-                        });
+                        aBoolean -> System.out.println("Download finish? " + aBoolean));
+
+        System.out.println("10s start");
 
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        System.out.println("10s end");
     }
 
     private static class ImageDownloader {
@@ -49,40 +48,30 @@ public class MultipleTaskRx {
             }
 
             return Observable.zip(Observable.from(imageUrlList)
-                            .map(new Func1<String, Observable<Boolean>>() {
-                                @Override
-                                public Observable<Boolean> call(String url) {
-                                    return downloadImage(url);
-                                }
-                            }),
-                    new FuncN<Boolean>() {
-                        public Boolean call(Object... args) {
-                            for (Object obj : args) {
-                                if (!(obj instanceof Boolean) || !((Boolean) obj)) {
-                                    return false;
-                                }
+                            .map(url -> downloadImage(url)),
+                    args -> {
+                        for (Object obj : args) {
+                            if (!(obj instanceof Boolean) || !((Boolean) obj)) {
+                                return false;
                             }
-                            return true;
                         }
+                        return true;
                     });
         }
 
         private Observable<Boolean> downloadImage(final String url) {
-            final int sleep = (int) (random.nextFloat() * 5000);
+            final int sleep = (int) (random.nextFloat() * 1000);
             System.out.println("start downloading: " + url + ", duration: " + sleep);
             System.out.println("thread 0: " + Thread.currentThread());
-            return Observable.defer(new Func0<Observable<Boolean>>() {
-                @Override
-                public Observable<Boolean> call() {
-                    System.out.println("thread for download: " + Thread.currentThread());
-                    try {
-                        Thread.sleep(sleep);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    return Observable.just(true);
+            return Observable.defer(() -> {
+                System.out.println("thread for download: " + Thread.currentThread());
+                try {
+                    Thread.sleep(sleep);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+
+                return Observable.just(true);
             }).subscribeOn(mScheduler);
         }
     }
