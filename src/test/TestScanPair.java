@@ -7,7 +7,7 @@ import rx.functions.Func2;
 /**
  * Created by bod on 9/1/16.
  */
-public class TestScan {
+public class TestScanPair {
 
     public static void main(String[] strings) {
 
