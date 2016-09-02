@@ -1,5 +1,6 @@
 package test;
 
+import com.sun.tools.javac.util.Pair;
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func1;
@@ -35,6 +36,19 @@ public class TestBufferPair {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static class PairTransformer<T> implements Observable.Transformer<T, Pair<T, T>> {
+
+        @Override
+        public Observable<Pair<T, T>> call(Observable<T> observable) {
+            return observable.buffer(2, 1).map(new Func1<List<T>, Pair<T, T>>() {
+                @Override
+                public Pair<T, T> call(List<T> ts) {
+                    return new Pair<T, T>(ts.get(0), ts.size() > 1 ? ts.get(1) : null);
+                }
+            });
         }
     }
 }
