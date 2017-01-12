@@ -8,14 +8,13 @@ import rx.Observable;
 public class NoBackPressure {
 
     public static void main(String[] args) {
-
-        long producePeriod = 100;
-        long consumePeriod = 300;
+        final long producePeriod = 100;
+        final long consumePeriod = 300;
         AtomicInteger pendingTaskCount = new AtomicInteger();
 
         // Create a fast producer emitting an infinite number of items.
         createStream(producePeriod, true, pendingTaskCount::incrementAndGet)
-                .flatMap(ignored ->
+                .flatMap(ignoredIntegerValue ->
                         // Create a slow consumer emitting just one item.
                         createStream(consumePeriod, false, pendingTaskCount::decrementAndGet))
                 .take(5)
