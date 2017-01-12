@@ -30,6 +30,7 @@ public class NoBackPressure {
                 @Override
                 public void run() {
                     do {
+                        System.out.println((pausePeriodMillis == 100 ? "producer" : "consumer") + ", " +  body.get());
                         pause(pausePeriodMillis);
                         T next = body.get();
                         onSubscribe.onNext(next);
