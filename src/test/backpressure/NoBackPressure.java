@@ -23,19 +23,18 @@ public class NoBackPressure {
                 .last();
 
         System.out.format("pending task count: %d\n", pendingTaskCount.get());
-
     }
 
     private static <T> Observable<T> createStream(long pausePeriodMillis, boolean infinite, Supplier<T> body) {
-        return Observable.create(subscriber -> {
+        return Observable.create(onSubscribe -> {
             new Thread() {
                 @Override
                 public void run() {
                     do {
                         pause(pausePeriodMillis);
                         T next = body.get();
-                        subscriber.onNext(next);
-                    } while (infinite && !subscriber.isUnsubscribed());
+                        onSubscribe.onNext(next);
+                    } while (infinite && !onSubscribe.isUnsubscribed());
                 }
             }.start();
         });
